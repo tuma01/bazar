@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans    
+        http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+	<context:property-placeholder location="classpath:amachi_app.properties" />
+
+	<!-- This sescion tells Spring context where to look for bean classes with appropriate annotations -->
+	<context:component-scan base-package="com.amachi.liferay"></context:component-scan>
+
+
+	<!-- Enabling annotation-driven transaction management -->
+<!-- 	<tx:annotation-driven transaction-manager="txManager" /> -->
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- scanning for autodetection of entity classes -->
+		<property name="packagesToScan" value="com.amachi.liferay.model" />
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${database.driver}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.user}" />
+		<property name="password" value="${database.password}" />
+	</bean>
+
+	<bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<tx:advice id="daoTxAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="create*" propagation="MANDATORY" />
+			<tx:method name="delete*" propagation="MANDATORY" />
+			<tx:method name="update*" propagation="MANDATORY" />
+			<tx:method name="find*" read-only="true" />
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="*" rollback-for="Throwable" no-rollback-for="java.lang.Exception" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut id="daoMethods" expression="execution(* com.amachi.liferay.dao.*Dao.*(..))" />
+		<aop:advisor advice-ref="daoTxAdvice" pointcut-ref="daoMethods" />
+	</aop:config>
+
+	<bean abstract="true" id="abstractDao">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+</beans> 

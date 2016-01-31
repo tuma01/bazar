@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd 
+    http://www.springframework.org/schema/tx 
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- *** Import the configuration requried by database acesses * (DataSource, transactions , hibernate) *** -->
+	<!-- =================================================================================== -->
+	<!-- ========================== Project specific : Back Office ========================= -->
+	<!-- =================================================================================== -->
+
+	<tx:annotation-driven />
+	<context:component-scan base-package="com.amachi.fwk" />
+
+	<context:property-placeholder location="classpath:amachi_app.properties" />
+	<!-- MySQL data source -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<!-- <bean id="dataSource" -->
+		<!-- class="org.apache.tomcat.dbcp.dbcp.BasicDataSource"> -->
+		<!-- <bean id="dataSource" -->
+		<!-- class="org.apache.commons.dbcp.BasicDataSource"> -->
+		<property name="driverClassName" value="${database.driver}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.user}" />
+		<property name="password" value="${database.password}" />
+	</bean>
+
+	<!-- Hibernate session factory -->
+	<!-- <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean"> -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan" value="com.amachi.fwk.model" />
+		<!-- <property name="annotatedClasses"> -->
+		<!-- <list> -->
+		<!-- <value>com.amachi.fwk.model.Pays</value> -->
+		<!-- </list> -->
+		<!-- </property> -->
+		
+
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				
+				<prop key="hibernate.cache.use_second_level_cache">false</prop>
+				<prop key="hibernate.cache.use_query_cache">false</prop>
+				<prop key="hibernate.connection.autocommit">false</prop>
+				<prop key="hibernate.connection.release_mode">auto</prop>
+				<prop key="hibernate.connection.isolation">2</prop>
+				<prop key="hibernate.jdbc.use_get_generated_keys">true</prop>
+
+				
+<!-- 				<prop key="hibernate.current_session_context_class">thread</prop> -->
+
+<!-- 				<prop key="hibernate.current_session_context_class">jta</prop> -->
+<!-- 				<prop key="hibernate.transaction.jta.platform"> -->
+<!-- 					org.hibernate.service.jta.platform.internal.SunOneJtaPlatform -->
+<!-- 				</prop> -->
+<!-- 				<prop key="hibernate.transaction.factory_class"> -->
+<!-- 					org.hibernate.transaction.CMTTransactionFactory -->
+<!-- 				</prop> -->
+
+
+
+
+				<!-- <prop key="use_sql_comments">true</prop> -->
+			</props>
+		</property>
+	</bean>
+
+	<bean id="persistenceExceptionTranslationPostProcessor" class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+
+	<!-- MUST have transaction manager, using aop and aspects -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+
+	<!-- Enable the configuration of transactional behavior based on annotations -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+
+	<!-- <tx:advice id="daoTxAdvice" transaction-manager="txManager"> -->
+	<!-- <tx:attributes> -->
+	<!-- <tx:method name="create*" propagation="MANDATORY" /> -->
+	<!-- <tx:method name="delete*" propagation="MANDATORY" /> -->
+	<!-- <tx:method name="update*" propagation="MANDATORY" /> -->
+	<!-- <tx:method name="find*" read-only="true" /> -->
+	<!-- <tx:method name="get*" read-only="true" /> -->
+	<!-- <tx:method name="*" rollback-for="Throwable" -->
+	<!-- no-rollback-for="java.lang.Exception" /> -->
+	<!-- </tx:attributes> -->
+	<!-- </tx:advice> -->
+	<!-- <aop:config> -->
+	<!-- <aop:pointcut id="daoMethods" -->
+	<!-- expression="execution(* com.amachi.fwk.dao.*Dao.*(..))" /> -->
+	<!-- <aop:advisor advice-ref="daoTxAdvice" pointcut-ref="daoMethods" /> -->
+	<!-- </aop:config> -->
+
+	<!-- <bean abstract="true" id="abstractDao"> -->
+	<!-- <property name="sessionFactory" ref="sessionFactory" /> -->
+	<!-- </bean> -->
+	<!-- <bean id="paysDao" class="com.amachi.fwk.dao.hibernate.PaysDaoImpl" parent="abstractDao"></bean> -->
+
+
+</beans>

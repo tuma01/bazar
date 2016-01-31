@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration PUBLIC "-//log4j/log4j Configuration//EN" "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{dd/MM/yy HH:mm:ss} | %-5p | %c{1} | %m%n" />
+		</layout>
+	</appender>
+
+	<!-- specify the logging level for loggers from other libraries -->
+
+	<logger name="org.springframework.context">
+		<level value="DEBUG"></level>
+	</logger>
+	
+	<!-- Trace toutes les requêtes SQL de type DML (gestion des données) -->
+<!-- 	<logger name="org.hibernate.SQL"> -->
+<!-- 		<level value="DEBUG"></level> -->
+<!-- 	</logger> -->
+
+	<!-- Trace toutes les requêtes SQL de type DDL (gestion de la structure 
+		de la base) -->
+<!-- 	<logger name="org.hibernate.tool.hbm2ddl"> -->
+<!-- 		<level value="DEBUG"></level> -->
+<!-- 	</logger> -->
+
+	<logger name="org.hibernate.type">
+		<level value="DEBUG"></level>
+	</logger>
+	<logger name="org.hibernate.transaction">
+		<level value="DEBUG"></level>
+	</logger>
+	
+	<logger name="org.hibernate.jdbc">
+		<level value="DEBUG"></level>
+	</logger>
+	
+
+	<!-- for all other loggers log only debug and above log messages -->
+	<root>
+<!-- 		<priority value="INFO" /> -->
+<!-- 		<priority value="DEBUG" /> -->
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	
+
+</log4j:configuration> 
